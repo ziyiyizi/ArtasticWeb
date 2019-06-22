@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repos
 {
@@ -24,9 +26,29 @@ namespace DAL.Repos
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<artworks>> GetLatestClickArtworks(long userId, int limit)
+        public async Task<long> GetMostClicksArtworkIdWeekly(DateTime start, DateTime end)
         {
-            throw new NotImplementedException();
+            var res = await _dbSet.Where(e => e.Clicktime >= start && e.Clicktime <= end)
+                .GroupBy(e => e.Artwork_ID)
+                .OrderByDescending(e => e.LongCount())
+                .Select(e => e.Key).Take(1).ToListAsync();
+            return res.First();
+        }
+
+        public async Task<IEnumerable<artworks>> GetLatestClickArtworks(long userId, int limit)
+        {
+            var res = await (from s in _dbSet
+                             where s.User_ID == userId
+                             join ru in _dbcontext.artworks
+                             on s.Artwork_ID equals ru.Artwork_ID
+                             orderby s.Clicktime descending
+                             select ru).Take(limit).ToListAsync();
+            return res;
+        }
+
+        public async Task<long> CountClicks(long artworkId)
+        {
+            return await _dbSet.LongCountAsync(e => e.Artwork_ID == artworkId);
         }
     }
 }

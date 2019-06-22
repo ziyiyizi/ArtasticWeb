@@ -5,6 +5,7 @@ using Model;
 using Model.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
@@ -22,6 +23,37 @@ namespace BLL.Serv
         {
             _uw = uw;
             _db = db;
+        }
+
+        public async Task<long> CountClicks(long artworkId)
+        {
+            return await _uw.ClickRepository.CountClicks(artworkId);
+        }
+
+        public async Task<artworks> GetArtworkWeekly()
+        {
+            var start = DateTime.Now.AddMinutes(-3600 * 24 * 7);
+            var end = DateTime.Now;
+            var artworkId = await _uw.ClickRepository.GetMostClicksArtworkIdWeekly(start, end);
+            return await _uw.ArtworkRepository.GetById(artworkId);
+        }
+
+        public async Task<List<string>> GetPopularTags()
+        {
+            var start = DateTime.Now.AddMinutes(-3600 * 24 * 7);
+            var end = DateTime.Now;
+            var tags = await _uw.TagRepository.GetPopularTagBetweenTime(start, end);
+            return tags.ToList();
+        }
+
+        public async Task<List<string>> GetSimilarTags(StringValues key)
+        {
+            if (StringValueUtils.IsNullOrEmpty(key))
+            {
+                return new List<string>();
+            }
+            var values = await _uw.TagRepository.GetSimilarTag(key);
+            return values.ToList();
         }
 
         public async Task<ArtworkLikes> GetArtworkLikesAsync(StringValues artworkId)
@@ -83,8 +115,9 @@ namespace BLL.Serv
 
         public async Task<bool> IsLike(long artworkId, long userId)
         {
-            IEnumerable<likes> f = await _uw.LikeRepository.GetByAllKey(userId, artworkId);
-            return f.Count() == 0 ? false : true;
+            //IEnumerable<likes> f = await _uw.LikeRepository.GetByAllKey(userId, artworkId);
+            //return f.Count() == 0 ? false : true;
+            return await _uw.LikeRepository.Exists(e => e.Artwork_ID == artworkId && e.User_ID == userId);
         }
 
         public async Task<int> Like(StringValues artworkId, StringValues userId)
@@ -223,7 +256,10 @@ namespace BLL.Serv
             }
             if (type.Equals("popular"))
             {
-                var _artworkIds = await _uw.ArtworkRepository.GetIdAllPageLikedSort(page);
+                var end = DateTime.Now;
+                var start = DateTime.Now.AddSeconds(-3600 * 24 * 7);
+                
+                var _artworkIds = await _uw.ArtworkRepository.GetIdAllPageLikedSortBetweenTime(page, start, end);
                 foreach (var value in _artworkIds)
                 {
                     artworkDetails.Add(await GetArtworkDetailsOneAsync(value, clientId));
@@ -240,16 +276,13 @@ namespace BLL.Serv
             }
             else if (type.Equals("mylikes"))
             {
-                //var _artworkIds = await _uw.LikeRepository.GetAllLikesPageTimeSort(clientId, page);
-                //foreach (var value in _artworkIds)
-                //{
-                //    artworkDetails.Add(await GetArtworkDetailsOneAsync(value, clientId));
-                //}
                 _artworks = await _uw.LikeRepository.GetAllPageLikeArtworksTimeSort(clientId, page);
             }
             else if (type.Equals("tweet"))
             {
-                var _artworkIds = await _uw.ArtworkRepository.GetIdAllPageCommentedSort(page);
+                var end = DateTime.Now;
+                var start = DateTime.Now.AddSeconds(-3600 * 24 * 30);
+                var _artworkIds = await _uw.ArtworkRepository.GetIdAllPageCommentedSortBetweenTime(page, start, end);
                 foreach (var value in _artworkIds)
                 {
                     artworkDetails.Add(await GetArtworkDetailsOneAsync(value, clientId));

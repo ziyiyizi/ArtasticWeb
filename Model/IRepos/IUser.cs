@@ -23,7 +23,7 @@ namespace Model.IRepos
         Task<string> GetStateById(long userId);
         Task<string> GetStateByName(string name);
         Task<string> GetTokenById(long userId);
-        Task<DateTime> GetTokenTimeById(long userId);
+        Task<DateTime?> GetTokenTimeById(long userId);
         Task<IList> GetIconAndNameById(long userId);
 
         Task<IEnumerable<users>> GetAllPageByName(string name, PageRequest page);
@@ -32,6 +32,6 @@ namespace Model.IRepos
         Task<IList> GetAllFollowed(long userId, PageRequest page);
         Task<long> CountWorks(long userId);
         Task<users> GetByMostWorkBtweenTime(DateTime start, DateTime end);
-
+        Task<int> UpdateIcon(users user);
     }
 }

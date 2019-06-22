@@ -31,6 +31,58 @@ namespace ArtasticWeb.Controllers
             uploadService = new UploadService(_uw, context);
         }
 
+        public async Task<JsonResult> GetWeekly()
+        {
+            ResponseContext responseContext = new ResponseContext();
+            try
+            {
+                Weekly weekly = new Weekly();
+                weekly.tags = await artworkService.GetPopularTags();
+                var artwork = await artworkService.GetArtworkWeekly();
+                if (artwork != null)
+                {
+                    weekly.artworkId = artwork.Artwork_ID;
+                    weekly.artworkName = artwork.Artwork_name;
+                    long artistId = artwork.Artist_ID;
+                    weekly.fileURL = artwork.Artdata1;
+                    weekly.artworkviews = await artworkService.CountClicks(artwork.Artwork_ID);
+                    users user = await userService.GetUserOne(artistId);
+                    if (user != null)
+                    {
+                        weekly.artistName = user.User_name;
+                        weekly.iconURL = user.User_icon;
+                        weekly.frenzy = await userService.CountFollows(artistId);
+                    }
+                }
+                responseContext.weekly = weekly;
+            }
+            catch (Exception e)
+            {
+
+            }
+            return new JsonResult(responseContext);
+        }
+
+        public async Task<JsonResult> GetRecommendTags()
+        {
+            ResponseContext responseContext = new ResponseContext();
+            try
+            {
+                Request.Headers.TryGetValue("present", out StringValues key);
+                var values = await artworkService.GetSimilarTags(key);
+                if (StringValueUtils.IsNullOrEmpty(values.First()))
+                {
+                    values.Add("unknown");
+                }
+                responseContext.values = values;
+            }
+            catch (Exception e)
+            {
+
+            }
+            return new JsonResult(responseContext);
+        }
+
         [HttpPost]
         public async Task<JsonResult> Upload()
         {
@@ -45,7 +97,11 @@ namespace ArtasticWeb.Controllers
                     Request.Form.TryGetValue("title", out StringValues title);
                     Request.Form.TryGetValue("description", out StringValues description);
                     var file = Request.Form.Files.GetFile("file");
-                    await uploadService.Upload(file.OpenReadStream(), file.FileName, title, tags, folders, description, long.Parse(userId));
+                    if (file != null)
+                    {
+                        await uploadService.Upload(file.OpenReadStream(), file.FileName, title, tags, folders, description, long.Parse(userId));
+                    }
+                    
                 }
                 
             }
@@ -153,17 +209,15 @@ namespace ArtasticWeb.Controllers
 
         public async Task<JsonResult> GetLikeAndComment()
         {
-            ResponseContext responseContext = new ResponseContext();
+            ArtworkLikes _likes = new ArtworkLikes();
             try
             {
                 Request.Headers.TryGetValue("artworkid", out StringValues artworkId);
                 Request.Headers.TryGetValue("userid", out StringValues userId);
                 if (!StringValueUtils.IsNullOrEmpty(artworkId))
                 {
-                    var _likes = await artworkService.GetArtworkLikesAsync(artworkId);
+                    _likes = await artworkService.GetArtworkLikesAsync(artworkId);
                     _likes = _likes ?? new ArtworkLikes();
-                    responseContext.likerslist = _likes.likerslist;
-                    responseContext.comments = _likes.comments;
                     await artworkService.Click(artworkId, userId);
                 }     
             }
@@ -171,7 +225,7 @@ namespace ArtasticWeb.Controllers
             {
 
             }
-            return new JsonResult(responseContext);
+            return new JsonResult(_likes);
         }
 
         public async Task<JsonResult> GetPost()
@@ -223,52 +277,6 @@ namespace ArtasticWeb.Controllers
             return new JsonResult(responseContext);
         }
 
-        // GET: Artworks
-        public async Task<IActionResult> Index()
-        {
-            return View(await _db.artworks.ToListAsync());
-        }
-
-        // GET: Artworks/Details/5
-        public async Task<IActionResult> Details(long? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var artworks = await _db.artworks
-                .FirstOrDefaultAsync(m => m.Artwork_ID == id);
-            if (artworks == null)
-            {
-                return NotFound();
-            }
-
-            return View(artworks);
-        }
-
-        // GET: Artworks/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Artworks/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Artwork_ID,Artist_ID,Artwork_name,Artwork_description,Artwork_dir,Artdata1,Uploadtime")] artworks artworks)
-        {
-            if (ModelState.IsValid)
-            {
-                _db.Add(artworks);
-                await _db.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(artworks);
-        }
-
         // GET: Artworks/Edit/5
         public async Task<IActionResult> Edit(long? id)
         {
@@ -318,40 +326,6 @@ namespace ArtasticWeb.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(artworks);
-        }
-
-        // GET: Artworks/Delete/5
-        public async Task<IActionResult> Delete(long? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var artworks = await _db.artworks
-                .FirstOrDefaultAsync(m => m.Artwork_ID == id);
-            if (artworks == null)
-            {
-                return NotFound();
-            }
-
-            return View(artworks);
-        }
-
-        // POST: Artworks/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
-        {
-            var artworks = await _db.artworks.FindAsync(id);
-            _db.artworks.Remove(artworks);
-            await _db.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool artworksExists(long id)
-        {
-            return _db.artworks.Any(e => e.Artwork_ID == id);
         }
     }
 }

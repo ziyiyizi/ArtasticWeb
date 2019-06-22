@@ -38,7 +38,7 @@ namespace DAL.Repos
                 userId = s.User_ID,
                 userName = s.User_name,
                 userIcon = s.User_icon
-            }).ToListAsync();
+            }).Skip(page.PageNumber * page.PageSize).Take(page.PageSize).ToListAsync();
         }
 
         public async Task<IList> GetAllFollowing(long userId, PageRequest page)
@@ -52,7 +52,7 @@ namespace DAL.Repos
                 userId = s.User_ID,
                 userName = s.User_name,
                 userIcon = s.User_icon
-            }).ToListAsync();
+            }).Skip(page.PageNumber * page.PageSize).Take(page.PageSize).ToListAsync();
         }
 
         public async Task<IEnumerable<users>> GetAllPageByName(string name, PageRequest page)
@@ -127,9 +127,10 @@ namespace DAL.Repos
              }).ToListAsync();
         }
 
-        public Task<string> GetIconById(long userId)
+        public async Task<string> GetIconById(long userId)
         {
-            throw new NotImplementedException();
+            var res = await Get(e => e.User_ID == userId);
+            return res == null ? "" : res.User_icon;
         }
 
         public async Task<long> GetIdByName(string name)
@@ -138,15 +139,16 @@ namespace DAL.Repos
             return res == null ? -1 : res.User_ID;
         }
 
-        public Task<string> GetMailById(long userId)
+        public async Task<string> GetMailById(long userId)
         {
-            throw new NotImplementedException();
+            var res = await Get(e => e.User_ID == userId);
+            return res == null ? "" : res.User_mail;
         }
 
         public async Task<string> GetNameById(long userId)
         {
             var res = await Get(e => e.User_ID == userId);
-            return res == null ? null : res.User_name;
+            return res == null ? "" : res.User_name;
         }
 
         public async Task<string> GetNameByWorkId(long artworkId)
@@ -164,16 +166,14 @@ namespace DAL.Repos
             {
                 return null;
             }
-
-            var res = await (from s in _dbSet
-                          where s.User_name == name
-                          select s.User_password).ToListAsync();
-            return res[0];
+            var u = await _dbSet.FirstOrDefaultAsync(e => e.User_name == name);
+            return u?.User_password;
         }
 
-        public Task<string> GetStateById(long userId)
+        public async Task<string> GetStateById(long userId)
         {
-            throw new NotImplementedException();
+            var res = await Get(e => e.User_ID == userId);
+            return res == null ? "" : res.User_state;
         }
 
         public Task<string> GetStateByName(string name)
@@ -181,14 +181,35 @@ namespace DAL.Repos
             throw new NotImplementedException();
         }
 
-        public Task<string> GetTokenById(long userId)
+        public async Task<string> GetTokenById(long userId)
         {
-            throw new NotImplementedException();
+            var res = await Get(e => e.User_ID == userId);
+            return res == null ? "" : res.User_token;
         }
 
-        public Task<DateTime> GetTokenTimeById(long userId)
+        public async Task<DateTime?> GetTokenTimeById(long userId)
         {
-            throw new NotImplementedException();
+            var res = await Get(e => e.User_ID == userId);
+            return res?.token_time;
+        }
+
+        public new async Task<int> Update(users user)
+        {
+            _dbSet.Attach(user);
+            _dbcontext.Entry(user).State = EntityState.Unchanged;
+            _dbcontext.Entry(user).Property(e => e.User_sex).IsModified = true;
+            _dbcontext.Entry(user).Property(e => e.User_description).IsModified = true;
+            _dbcontext.Entry(user).Property(e => e.User_password).IsModified = true;
+            _dbcontext.Entry(user).Property(e => e.User_mail).IsModified = true;
+            return await _dbcontext.SaveChangesAsync();
+        }
+
+        public async Task<int> UpdateIcon(users user)
+        {
+            _dbSet.Attach(user);
+            _dbcontext.Entry(user).State = EntityState.Unchanged;
+            _dbcontext.Entry(user).Property(e => e.User_icon).IsModified = true;
+            return await _dbcontext.SaveChangesAsync();
         }
     }
 }

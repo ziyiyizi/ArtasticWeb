@@ -11,7 +11,7 @@ namespace BLL.Models
         public long artistId;
         public String artistName;
         public String iconURL;
-        public int frenzy;
+        public long frenzy;
         public long worknum;
         public String joinyear;
         public String description;

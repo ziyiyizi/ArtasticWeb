@@ -15,11 +15,31 @@ namespace BLL.Serv
     {
         private UnitOfWork _uw;
         private ArtasticContext _db;
+        private ObjectStoreAccess osa;
 
         public UploadService(UnitOfWork uw, ArtasticContext db)
         {
             _uw = uw;
             _db = db;
+            osa = new ObjectStoreAccess();
+        }
+
+        public async Task<int> UploadIcon(Stream stream, string fileName, long userId)
+        {
+            if (userId < 0)
+            {
+                return -1;
+            }
+
+            osa.ChangeDir(userId.ToString() + "Icon/");
+            string name = osa.UploadFile(stream, fileName);
+            string url = osa.GetImgUrl(name);
+            return await _uw.UserRepository.UpdateIcon(new users
+            {
+                User_ID = userId,
+                User_icon = url
+            });
+            //return await _uw.UserRepository.UpdateIcon(userId, url);
         }
 
         public async Task<int> Upload(Stream stream, string fileName, string title, string tags, string folders, string desc, long clientId)
@@ -28,7 +48,7 @@ namespace BLL.Serv
             {
                 return -1;
             }
-            ObjectStoreAccess osa = new ObjectStoreAccess();
+            
             if (StringValueUtils.IsNullOrEmpty(title))
             {
                 title = "unkonwn";

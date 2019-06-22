@@ -8,8 +8,8 @@ namespace Model.IRepos
 {
     public interface IFollow : IRepository<follow>
     {
-        Task<int> CountFollowed(long artistId);
-        Task<int> CountFollowing(long userId);
+        Task<long> CountFollowed(long artistId);
+        Task<long> CountFollowing(long userId);
 
         Task<IEnumerable<follow>> GetByAllKey(long userId, long artistId);
 

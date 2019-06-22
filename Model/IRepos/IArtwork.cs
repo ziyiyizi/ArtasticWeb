@@ -1,5 +1,6 @@
 ﻿using Model.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +16,10 @@ namespace Model.IRepos
         Task<IEnumerable<artworks>> GetAllPage(PageRequest page);
 
         Task<IEnumerable<artworks>> GetAllPageTimeSort(PageRequest page);
-        Task<IEnumerable<artworks>> GetAllPageCommentedSort(PageRequest page);
-        Task<IEnumerable<artworks>> GetAllPageLikedSort(PageRequest page);
-        Task<IEnumerable<artworks>> GetAllPageLikedSortBetweenTime(PageRequest page, DateTime start, DateTime end);
+        Task<IEnumerable<long>> GetIdAllPageCommentedSort(PageRequest page);
+        Task<IEnumerable<long>> GetIdAllPageCommentedSortBetweenTime(PageRequest page, DateTime start, DateTime end);
+        Task<IEnumerable<long>> GetIdAllPageLikedSort(PageRequest page);
+        Task<IEnumerable<long>> GetIdAllPageLikedSortBetweenTime(PageRequest page, DateTime start, DateTime end);
         Task<IEnumerable<artworks>> GetAllPageRandSort(PageRequest page);
         Task<IEnumerable<artworks>> GetFollowing(long userId, PageRequest page);
 
@@ -26,7 +28,5 @@ namespace Model.IRepos
         Task<IEnumerable<artworks>> GetAllPageByUserNameEX(string userName, PageRequest page);
         Task<IEnumerable<artworks>> GetAllPageByTag(string tagName, PageRequest page);
         Task<IEnumerable<artworks>> GetAllPageByTagEX(string tagName, PageRequest page);
-
-
     }
 }

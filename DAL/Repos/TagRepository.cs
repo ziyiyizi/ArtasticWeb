@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 
 namespace DAL.Repos
 {
@@ -33,14 +34,33 @@ namespace DAL.Repos
                           select e.Tag_name).ToListAsync();
         }
 
-        public Task<IEnumerable<tags>> GetPopularTagBetweenTime(DateTime start, DateTime end)
+        public async Task<IEnumerable<string>> GetPopularTagBetweenTime(DateTime start, DateTime end)
         {
-            throw new NotImplementedException();
+            //from s in _dbcontext.likes
+            //where s.liketime >= start && s.liketime <= end
+            //join ru in _dbcontext.tags
+            //on s.Artwork_ID equals ru.Artwork_ID
+
+            var res = _dbcontext.likes.Where(e => (e.liketime >= start && e.liketime <= end))
+                .Join(_dbcontext.tags, e => e.Artwork_ID, r => r.Artwork_ID, (p, c) => new { p.Artwork_ID, c.Tag_name })
+                .GroupBy(e => e.Tag_name)
+                .OrderByDescending(e => e.LongCount())
+                .Select(e => e.Key)
+                .Take(5);
+            return await res.ToListAsync();
         }
 
-        public Task<IEnumerable<tags>> GetSimilarTag(string key)
+        public async Task<IEnumerable<string>> GetSimilarTag(string key)
         {
-            throw new NotImplementedException();
+            var ids = _dbSet.Where(e => e.Tag_name == key).Select(e => e.Artwork_ID);
+            var res = _dbSet.Where(e => ids.Contains(e.Artwork_ID) && e.Tag_name != key)
+                .GroupBy(e => e.Tag_name)
+                .OrderByDescending(e => e.LongCount())
+                .Select(e => e.Key)
+                .Take(5);
+
+            return await res.ToListAsync();
+            
         }
     }
 }

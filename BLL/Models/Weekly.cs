@@ -10,10 +10,10 @@ namespace BLL.Models
         public List<String> tags;
         public String iconURL;
         public String artistName;
-        public int frenzy;
-        public int artworkId;
+        public long frenzy;
+        public long artworkId;
         public String artworkName;
         public String fileURL;
-        public int artworkviews;
+        public long artworkviews;
     }
 }

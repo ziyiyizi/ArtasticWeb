@@ -23,10 +23,7 @@ namespace DAL.Repos
                 return 0;
             }
 
-            var res = await (from s in _dbSet
-            where s.Noti_State == "0" && s.Receiver_name == receiverName
-            select s).ToListAsync();
-            return res.Count;
+            return await _dbSet.CountAsync(e => e.Noti_State.Equals("0") && e.Receiver_name.Equals(receiverName));
         }
 
         public async Task<IEnumerable<notification>> GetByReceiverNameOrderByNotiTimeDesc(string receiverName)

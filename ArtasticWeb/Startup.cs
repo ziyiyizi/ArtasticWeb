@@ -99,6 +99,26 @@ namespace ArtasticWeb
                     name: "getmemberdetail",
                     template: "getmemberdetail/{controller=User}/{action=GetMemberDetails}"
                 );
+                routes.MapRoute(
+                    name: "login",
+                    template: "user/login/{controller=User}/{action=Login}"
+                );
+                routes.MapRoute(
+                    name: "getrecommendtags",
+                    template: "getrecommendtags/{controller=Artworks}/{action=GetRecommendTags}"
+                );
+                routes.MapRoute(
+                    name: "getprofile",
+                    template: "getprofile/{controller=User}/{action=GetUser}"
+                );
+                routes.MapRoute(
+                    name: "uploadprofile",
+                    template: "uploadprofile/{controller=User}/{action=UploadProfile}"
+                );
+                routes.MapRoute(
+                    name: "getweekly",
+                    template: "getweekly/{controller=Artworks}/{action=GetWeekly}"
+                );
             });
 
         }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 
 namespace DAL.Repos
 {
@@ -113,11 +114,6 @@ namespace DAL.Repos
             
         }
 
-        public async Task<IEnumerable<artworks>> GetAllPageCommentedSort(PageRequest page)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<IEnumerable<long>> GetIdAllPageCommentedSort(PageRequest page)
         {
             var ids = await (from s in _dbcontext.comments
@@ -125,11 +121,6 @@ namespace DAL.Repos
                              orderby g.Count() descending
                              select g.Key).Skip(page.PageNumber * page.PageSize).Take(page.PageSize).ToListAsync();
             return ids;
-        }
-
-        public async Task<IEnumerable<artworks>> GetAllPageLikedSort(PageRequest page)
-        {
-            throw new NotImplementedException();       
         }
 
         public async Task<IEnumerable<long>> GetIdAllPageLikedSort(PageRequest page)
@@ -141,9 +132,14 @@ namespace DAL.Repos
             return ids;
         }
 
-        public Task<IEnumerable<artworks>> GetAllPageLikedSortBetweenTime(PageRequest page, DateTime start, DateTime end)
+        public async Task<IEnumerable<long>> GetIdAllPageLikedSortBetweenTime(PageRequest page, DateTime start, DateTime end)
         {
-            throw new NotImplementedException();
+            var ids = await(from s in _dbcontext.likes
+                            where s.liketime >= start && s.liketime <= end
+                            group s by s.Artwork_ID into g
+                            orderby g.Count() descending
+                            select g.Key).Skip(page.PageNumber * page.PageSize).Take(page.PageSize).ToListAsync();
+            return ids;
         }
 
         public async Task<IEnumerable<artworks>> GetAllPageRandSort(PageRequest page)
@@ -185,6 +181,34 @@ namespace DAL.Repos
         {
             var res = await Get(e => e.Artwork_ID == artworkId);
             return res.Artwork_name;
+        }
+
+        public async Task<IEnumerable<long>> GetIdAllPageCommentedSortBetweenTime(PageRequest page, DateTime start, DateTime end)
+        {
+            var ids = await(from s in _dbcontext.comments
+                            where s.Comment_time >= start && s.Comment_time <= end
+                            group s by s.Artwork_ID into g
+                            orderby g.Count() descending
+                            select g.Key).Skip(page.PageNumber * page.PageSize).Take(page.PageSize).ToListAsync();
+            return ids;
+        }
+
+        public async Task<IEnumerable<artworks>> GetIdRecommend(PageRequest page, long userId, DateTime start, DateTime end)
+        {
+            var tag = _dbcontext.clicks.Where(e => e.User_ID == userId && e.Clicktime >= start && e.Clicktime <= end)
+                .Join(_dbcontext.tags, l => l.Artwork_ID, r => r.Artwork_ID, (l, r) => new { l.Click_ID, r.Artwork_ID, r.Tag_name })
+                .GroupBy(e => e.Tag_name)
+                .OrderByDescending(e => e.LongCount())
+                .Select(e => e.Key)
+                .Take(5);
+
+            var res = await _dbcontext.tags.Where(e => !e.Tag_name.Equals("unknown") && tag.Contains(e.Tag_name))
+                .OrderBy(e => Guid.NewGuid())
+                .Take(page.PageSize)
+                .Join(_dbSet, l => l.Artwork_ID, r => r.Artwork_ID, (l, r) => r)
+                .ToListAsync();
+           
+            return res;
         }
     }
 }

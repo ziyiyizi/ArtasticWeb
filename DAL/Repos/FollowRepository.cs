@@ -16,22 +16,14 @@ namespace DAL.Repos
 
         }
 
-        public async Task<int> CountFollowed(long artistId)
+        public async Task<long> CountFollowed(long artistId)
         {
-            //var res = await (from s in _dbSet
-            //                where s.Artist_ID == artistId
-            //                select s).ToListAsync();
-            //return res.Count;
-            return await _dbSet.Where(e => e.Artist_ID == artistId).CountAsync();
+            return await _dbSet.Where(e => e.Artist_ID == artistId).LongCountAsync();
         }
 
-        public async Task<int> CountFollowing(long userId)
+        public async Task<long> CountFollowing(long userId)
         {
-            //var res = await (from s in _dbSet
-            //                where s.Follower_ID == userId
-            //                select s).ToListAsync();
-            //return res.Count;
-            return await _dbSet.Where(e => e.Follower_ID == userId).CountAsync();
+            return await _dbSet.Where(e => e.Follower_ID == userId).LongCountAsync();
         }
 
         public async Task<IEnumerable<follow>> GetByAllKey(long userId, long artistId)
@@ -42,9 +34,14 @@ namespace DAL.Repos
             return res;
         }
 
-        public Task<IEnumerable<long>> GetMostFollowedBetweenTime(DateTime start, DateTime end)
+        public async Task<IEnumerable<long>> GetMostFollowedBetweenTime(DateTime start, DateTime end)
         {
-            throw new NotImplementedException();
+            var ids = await(from s in _dbSet
+                            where s.followtime >= start && s.followtime <= end
+                            group s by s.Artist_ID into g
+                            orderby g.Count() descending
+                            select g.Key).Take(10).ToListAsync();
+            return ids;
         }
     }
 }

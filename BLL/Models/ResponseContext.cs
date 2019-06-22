@@ -15,12 +15,13 @@ namespace BLL.Models
         public List<UserDetails> members;
         public UserDetails member;
         public List<notification> notification;
-        public List<String> values;
+        public List<string> values;
         public int notifyNum;
         public Weekly weekly;
         public bool error;
-        public String errorMsg;
-        public IList likerslist;
-        public IList comments;
+        public string errorMsg;
+        public string userName;
+        public long userId;
+        public string iconURL;
     }
 }

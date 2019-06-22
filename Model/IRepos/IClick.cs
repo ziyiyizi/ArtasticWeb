@@ -11,6 +11,7 @@ namespace Model.IRepos
         Task<IEnumerable<artworks>> GetLatestClickArtworks(long userId, int limit);
         Task<IEnumerable<IDictionary<string, int>>> GetClicksPerMonth(long artworkId);
         Task<IEnumerable<IDictionary<string, int>>> GetClicksSliceBySex(long artworkId);
-
+        Task<long> GetMostClicksArtworkIdWeekly(DateTime start, DateTime end);
+        Task<long> CountClicks(long artworkId);
     }
 }

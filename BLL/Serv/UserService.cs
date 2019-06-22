@@ -23,14 +23,35 @@ namespace BLL.Serv
             _db = db;
         }
 
+        public async Task<long> CountFollows(long userId)
+        {
+            return await _uw.FollowRepository.CountFollowed(userId);
+        }
+
+        public async Task<users> Login(string username, string pwd)
+        {
+            if (StringValueUtils.IsNullOrEmpty(username) || StringValueUtils.IsNullOrEmpty(pwd))
+            {
+                return null;
+            }
+
+            users user = await _uw.UserRepository.GetByName(username);
+            if (user != null)
+            {
+                return user.User_password == pwd && user.User_state.Equals("1") ? user : null;
+            }
+            return user;
+        }
+
         public async Task<bool> IsFollow(long followingId, long followedId)
         {
             if (followedId == followingId)
             {
                 return false;
             }
-            IEnumerable<follow> f = await _uw.FollowRepository.GetByAllKey(followingId, followedId);
-            return f.Count() == 0 ? false : true;
+            //IEnumerable<follow> f = await _uw.FollowRepository.GetByAllKey(followingId, followedId);
+            //return f.Count() == 0 ? false : true;
+            return await _uw.FollowRepository.Exists(e => e.Follower_ID == followingId && e.Artist_ID == followedId);
         }
 
         public async Task<int> Follow(long followingId, long followedId)

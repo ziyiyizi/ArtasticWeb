@@ -15,9 +15,73 @@ namespace ArtasticWeb.Controllers
     public class UserController : BaseController
     {
         private UserService userService;
+        private UploadService uploadService;
         public UserController(ArtasticContext context) : base(context)
         {
             userService = new UserService(_uw, context);
+            uploadService = new UploadService(_uw, context);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UploadProfile()
+        {
+            ResponseContext responseContext = new ResponseContext();
+            try
+            {
+                Request.Headers.TryGetValue("userid", out StringValues idstring);
+                if (StringValueUtils.IsNullOrEmpty(idstring))
+                {
+                    responseContext.error = true;
+                    responseContext.errorMsg = "Please Sign In First!";
+                }
+                long userId = long.Parse(idstring);
+                Request.Form.TryGetValue("userSex", out StringValues sex);
+                Request.Form.TryGetValue("userDescription", out StringValues desc);
+                Request.Form.TryGetValue("userMail", out StringValues mail);
+                Request.Form.TryGetValue("userPassword", out StringValues pwd);
+                var file = Request.Form.Files.GetFile("file");
+                if (file != null)
+                {
+                    await uploadService.UploadIcon(file.OpenReadStream(), file.FileName, userId);
+                }
+                await userService.UpdateUserOne(new users
+                {
+                    User_ID = userId,
+                    User_sex = sex,
+                    User_description = desc,
+                    User_mail = mail,
+                    User_password = pwd
+                });
+            }
+            catch (Exception e)
+            {
+
+            }
+            return new JsonResult(responseContext);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> Login()
+        {
+            ResponseContext responseContext = new ResponseContext();
+            try
+            {
+                Request.Form.TryGetValue("username", out StringValues username);
+                Request.Form.TryGetValue("password", out StringValues pwd);
+                users user = await userService.Login(username, pwd);
+                if(user != null)
+                {
+                    responseContext.iconURL = user.User_icon;
+                    responseContext.userName = user.User_name;
+                    responseContext.userId = user.User_ID;
+                }
+                
+            }
+            catch (Exception e)
+            {
+
+            }
+            return new JsonResult(responseContext);
         }
 
         public async Task<JsonResult> GetMemberDetails()
@@ -71,7 +135,15 @@ namespace ArtasticWeb.Controllers
 
             }
 
-            return user == null ? new JsonResult(new users()) : new JsonResult(user);
+            return user == null ? new JsonResult(new users()) 
+                : new JsonResult(new users
+                {
+                    User_name = user.User_name,
+                    User_sex = user.User_sex,
+                    User_description = user.User_description,
+                    User_icon = user.User_icon
+                }
+                );
         }
 
         public async Task<JsonResult> Follow()

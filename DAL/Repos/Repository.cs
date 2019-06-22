@@ -21,10 +21,17 @@ namespace DAL.Repos
             _dbcontext = context;
             _dbSet = _dbcontext.Set<T>();
         }
-        public async Task<long> Count()
+
+        public async Task<bool> Exists(Expression<Func<T, bool>> predicate)
         {
-            return await _dbSet.LongCountAsync();
+            return await _dbSet.AnyAsync(predicate);
         }
+
+        public async Task<long> Count(Expression<Func<T, bool>> predicate = null)
+        {
+            return await _dbSet.LongCountAsync(predicate);
+        }
+
         public async Task<int> Delete(T entity)
         {
             _dbSet.Remove(entity);

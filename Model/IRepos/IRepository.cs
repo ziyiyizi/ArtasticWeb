@@ -17,6 +17,6 @@ namespace Model.IRepos
         Task<int> Insert(T entity);
         Task<int> Delete(T entity);
         Task<int> Update(T entity);
-        Task<long> Count();
+        Task<long> Count(Expression<Func<T, bool>> predicate);
     }
 }
