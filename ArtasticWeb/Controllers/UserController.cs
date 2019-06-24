@@ -23,6 +23,29 @@ namespace ArtasticWeb.Controllers
         }
 
         [HttpPost]
+        public async Task<JsonResult> Register([FromBody] Params p)
+        {
+            try
+            {
+                if (await userService.IsNameOrMailExists(p.userName, p.email))
+                {
+                    p.error = true;
+                    p.errorMsg = ("The name or email is already exists!");
+                    return new JsonResult(p);
+                }
+                if (await userService.Register(p) == -1)
+                {
+                    p.error = true;
+                }
+            }
+            catch (Exception e)
+            {
+                p.error = true;
+            }
+            return new JsonResult(p);
+        }
+
+        [HttpPost]
         public async Task<JsonResult> UploadProfile()
         {
             ResponseContext responseContext = new ResponseContext();
@@ -61,27 +84,27 @@ namespace ArtasticWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Login()
+        public async Task<JsonResult> Login([FromBody] Params p)
         {
-            ResponseContext responseContext = new ResponseContext();
             try
             {
-                Request.Form.TryGetValue("username", out StringValues username);
-                Request.Form.TryGetValue("password", out StringValues pwd);
-                users user = await userService.Login(username, pwd);
-                if(user != null)
+                users user = await userService.Login(p.userName, p.password);
+                if (user != null)
                 {
-                    responseContext.iconURL = user.User_icon;
-                    responseContext.userName = user.User_name;
-                    responseContext.userId = user.User_ID;
+                    p.iconURL = user.User_icon;
+                    p.userId = user.User_ID;
+                    p.password = "";
                 }
-                
+                else
+                {
+                    p.error = true;
+                }
             }
             catch (Exception e)
             {
-
+                p.error = true;
             }
-            return new JsonResult(responseContext);
+            return new JsonResult(p);
         }
 
         public async Task<JsonResult> GetMemberDetails()
@@ -142,6 +165,7 @@ namespace ArtasticWeb.Controllers
                     User_sex = user.User_sex,
                     User_description = user.User_description,
                     User_icon = user.User_icon
+
                 }
                 );
         }

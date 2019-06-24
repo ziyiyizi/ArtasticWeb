@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
+using System.Threading;
 using System.Threading.Tasks;
+using BLL.Models;
+using BLL.Serv;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,6 +40,10 @@ namespace ArtasticWeb
                 options.AddPolicy("allallow", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod())
             );
 
+            //services.AddOptions();
+            //services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+            //services.AddSingleton<EmailService>();
+
             var connection = Configuration.GetConnectionString("ArtasticConnection");
             services.AddDbContext<ArtasticContext>(options => options.UseMySql(connection));
 
@@ -57,6 +65,24 @@ namespace ArtasticWeb
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseCors("allallow");
+
+            app.Use(async (context, next) =>
+            {
+                if (context.WebSockets.IsWebSocketRequest)
+                {
+                    using (IServiceScope scope = app.ApplicationServices.CreateScope())
+                    {
+                        //do something 
+                        WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                        await Echo(context, webSocket);
+                    }
+                }
+                else
+                {
+                    //Hand over to the next middleware
+                    await next();
+                }
+            });
 
             app.UseMvc(routes =>
             {
@@ -119,8 +145,30 @@ namespace ArtasticWeb
                     name: "getweekly",
                     template: "getweekly/{controller=Artworks}/{action=GetWeekly}"
                 );
+                routes.MapRoute(
+                    name: "community",
+                    template: "community/{controller=Home}/{action=Index}"
+                );
+                routes.MapRoute(
+                    name: "register",
+                    template: "register/{controller=User}/{action=Register}"
+                );
             });
 
         }
+
+        private async Task Echo(HttpContext context, WebSocket webSocket)
+        {
+            var buffer = new byte[1024 * 4];
+            WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            while (!result.CloseStatus.HasValue)
+            {
+                await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
+
+                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            }
+            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+        }
+
     }
 }
