@@ -293,39 +293,5 @@ namespace ArtasticWeb.Controllers
             return View(artworks);
         }
 
-        // POST: Artworks/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Artwork_ID,Artist_ID,Artwork_name,Artwork_description,Artwork_dir,Artdata1,Uploadtime")] artworks artworks)
-        {
-            if (id != artworks.Artwork_ID)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _db.Update(artworks);
-                    await _db.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!artworksExists(artworks.Artwork_ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(artworks);
-        }
     }
 }

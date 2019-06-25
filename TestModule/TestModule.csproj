@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CLRF\CLRF.csproj" />
     <ProjectReference Include="..\OSA\OSA.csproj" />
   </ItemGroup>
 
