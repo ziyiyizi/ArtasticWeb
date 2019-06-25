@@ -1,4 +1,5 @@
 ﻿using System;
+using CLRLogger;
 
 namespace CLR
 {
@@ -7,6 +8,9 @@ namespace CLR
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+            Class1 cls = new Class1();
+            Console.WriteLine(cls.log(1));
+            Console.Read();
         }
     }
 }
