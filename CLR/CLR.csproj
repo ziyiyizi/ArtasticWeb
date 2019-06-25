@@ -14,10 +14,4 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="CLRLogger">
-      <HintPath>bin\CLRLogger.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

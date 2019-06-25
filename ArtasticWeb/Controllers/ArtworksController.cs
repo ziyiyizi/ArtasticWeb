@@ -58,7 +58,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
             return new JsonResult(responseContext);
         }
@@ -78,7 +78,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
             return new JsonResult(responseContext);
         }
@@ -107,7 +107,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
 
             return new JsonResult(responseContext);
@@ -159,7 +159,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
             return new JsonResult(responseContext);
         }
@@ -182,7 +182,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
             return new JsonResult(responseContext);
         }
@@ -202,7 +202,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
             return new JsonResult(responseContext);
         }
@@ -248,7 +248,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
             return new JsonResult(responseContext);
         }
@@ -272,25 +272,9 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-                
+                responseContext.error = true;
             }
             return new JsonResult(responseContext);
-        }
-
-        // GET: Artworks/Edit/5
-        public async Task<IActionResult> Edit(long? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var artworks = await _db.artworks.FindAsync(id);
-            if (artworks == null)
-            {
-                return NotFound();
-            }
-            return View(artworks);
         }
     }
 }

@@ -9,4 +9,10 @@
     <ProjectReference Include="..\OSA\OSA.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="ShareLibrary">
+      <HintPath>..\ShareLibrary\bin\Debug\netcoreapp2.2\ShareLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

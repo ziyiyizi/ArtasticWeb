@@ -67,11 +67,11 @@ namespace DAL.Repos
             {
                 if (predicate == null)
                 {
-                    return await _dbSet.OrderBy(orderBy).ToListAsync();
+                    return await _dbSet.OrderByDescending(orderBy).ToListAsync();
                 }
                 else
                 {
-                    return await _dbSet.Where(predicate).OrderBy(orderBy).ToListAsync();
+                    return await _dbSet.Where(predicate).OrderByDescending(orderBy).ToListAsync();
                 }
             }
         }
@@ -105,11 +105,11 @@ namespace DAL.Repos
             {
                 if (predicate == null)
                 {
-                    return await _dbSet.OrderBy(orderBy).Skip((page.PageNumber) * page.PageSize).Take(page.PageSize).ToListAsync();
+                    return await _dbSet.OrderByDescending(orderBy).Skip((page.PageNumber) * page.PageSize).Take(page.PageSize).ToListAsync();
                 }
                 else
                 {
-                    return await _dbSet.Where(predicate).OrderBy(orderBy).Skip((page.PageNumber) * page.PageSize).Take(page.PageSize).ToListAsync();
+                    return await _dbSet.Where(predicate).OrderByDescending(orderBy).Skip((page.PageNumber) * page.PageSize).Take(page.PageSize).ToListAsync();
                 }
             }
         }

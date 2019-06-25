@@ -33,7 +33,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
             return responseContext;
         }
@@ -52,7 +52,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
             return responseContext;
         }

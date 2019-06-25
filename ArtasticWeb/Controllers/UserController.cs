@@ -78,7 +78,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
             return new JsonResult(responseContext);
         }
@@ -139,7 +139,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
 
             return new JsonResult(responseContext);
@@ -185,7 +185,7 @@ namespace ArtasticWeb.Controllers
             }
             catch (Exception e)
             {
-
+                responseContext.error = true;
             }
 
             return new JsonResult(responseContext);
