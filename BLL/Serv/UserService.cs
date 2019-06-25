@@ -43,6 +43,37 @@ namespace BLL.Serv
             return user;
         }
 
+        public async Task<int> AddUser(users user)
+        {
+            return await _uw.UserRepository.Insert(user);
+        }
+
+        public async Task<int> Register(Params p)
+        {
+            var time = DateTime.Now;
+            var token = Guid.NewGuid().ToString("N");
+            var tokenTime = DateTime.Now.AddDays(1);
+
+            var user = new users
+            {
+                User_name = p.userName,
+                User_password = p.password,
+                User_mail = p.email,
+                User_sex = p.sex,
+                Registertime = time,
+                token_time = tokenTime,
+                User_token = token,
+                User_state = "1",
+                User_icon = "/a60613b465f2dd5c6f5848d3feb40ffd.jpg"
+            };
+            return await _uw.UserRepository.Insert(user);
+        }
+
+        public async Task<bool> IsNameOrMailExists(string name, string email)
+        {
+            return await _uw.UserRepository.Exists(e => e.User_name == name || e.User_mail == email);
+        }
+
         public async Task<bool> IsFollow(long followingId, long followedId)
         {
             if (followedId == followingId)

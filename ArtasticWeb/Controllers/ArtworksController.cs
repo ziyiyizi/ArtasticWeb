@@ -292,6 +292,5 @@ namespace ArtasticWeb.Controllers
             }
             return View(artworks);
         }
-
     }
 }

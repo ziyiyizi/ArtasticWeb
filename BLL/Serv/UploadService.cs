@@ -31,7 +31,7 @@ namespace BLL.Serv
                 return -1;
             }
 
-            osa.ChangeDir(userId.ToString() + "Icon/");
+            osa.ChangeDir(userId.ToString() + "/Icon/");
             string name = osa.UploadFile(stream, fileName);
             string url = osa.GetImgUrl(name);
             return await _uw.UserRepository.UpdateIcon(new users
@@ -44,7 +44,7 @@ namespace BLL.Serv
 
         public async Task<int> Upload(Stream stream, string fileName, string title, string tags, string folders, string desc, long clientId)
         {
-            if(clientId < 0)
+            if (clientId < 0)
             {
                 return -1;
             }
