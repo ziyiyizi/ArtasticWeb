@@ -1,4 +1,5 @@
 ﻿using OSA;
+using ShareLibrary;
 using System;
 using System.IO;
 
@@ -17,8 +18,7 @@ namespace TestModule
             //String imgUrl = osa.GetImgUrl(name);
             //Console.WriteLine(name);
             //Console.WriteLine(imgUrl);
-
-
+            ShareUtils.Now();
         }
     }
 }

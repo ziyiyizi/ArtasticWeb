@@ -11,7 +11,7 @@ namespace CLRF
     {
         public static void Main(string[] args)
         {
-            
+            Test();
         }
 
         public static void Test()
