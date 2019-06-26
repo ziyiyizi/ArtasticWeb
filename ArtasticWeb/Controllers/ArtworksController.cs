@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Web;
 using BLL.Models;
 using BLL.Serv;
 using BLL.Utils;
@@ -68,7 +70,8 @@ namespace ArtasticWeb.Controllers
             ResponseContext responseContext = new ResponseContext();
             try
             {
-                Request.Headers.TryGetValue("present", out StringValues key);
+                Request.Headers.TryGetValue("present", out StringValues key1);
+                var key = HttpUtility.UrlDecode(key1);
                 var values = await artworkService.GetSimilarTags(key);
                 if (StringValueUtils.IsNullOrEmpty(values.First()))
                 {
@@ -118,7 +121,9 @@ namespace ArtasticWeb.Controllers
             ResponseContext responseContext = new ResponseContext();
             try
             {
-                Request.Headers.TryGetValue("present", out StringValues present);
+                
+                Request.Headers.TryGetValue("present", out StringValues present1);
+                var present = HttpUtility.UrlDecode(present1);
                 Request.Headers.TryGetValue("userId", out StringValues userId);
                 Request.Headers.TryGetValue("page", out StringValues _page);
                 int pageNo = 0;
@@ -192,7 +197,7 @@ namespace ArtasticWeb.Controllers
             ResponseContext responseContext = new ResponseContext();
             try
             {
-                Request.Headers.TryGetValue("artworkid", out StringValues artworkId);
+                Request.Headers.TryGetValue("present", out StringValues artworkId);
                 Request.Headers.TryGetValue("userid", out StringValues userId);
                 if (!StringValueUtils.IsNullOrEmpty(artworkId) && !StringValueUtils.IsNullOrEmpty(userId))
                 {

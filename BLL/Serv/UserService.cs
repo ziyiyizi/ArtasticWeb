@@ -48,11 +48,14 @@ namespace BLL.Serv
             return await _uw.UserRepository.Insert(user);
         }
 
-        public async Task<int> Register(Params p)
+        public async Task<users> Register(Params p)
         {
             var time = DateTime.Now;
             var token = Guid.NewGuid().ToString("N");
             var tokenTime = DateTime.Now.AddDays(1);
+
+            string boyicon = "http://pic-artastic.oss-cn-shanghai.aliyuncs.com/PicArtastic/common/boy.jpg";
+            string girlicon = "http://pic-artastic.oss-cn-shanghai.aliyuncs.com/PicArtastic/common/girl.jpg";
 
             var user = new users
             {
@@ -64,9 +67,10 @@ namespace BLL.Serv
                 token_time = tokenTime,
                 User_token = token,
                 User_state = "1",
-                User_icon = "/a60613b465f2dd5c6f5848d3feb40ffd.jpg"
+                User_icon = p.sex.Equals("boy") ? boyicon : girlicon
             };
-            return await _uw.UserRepository.Insert(user);
+            await _uw.UserRepository.Insert(user);
+            return user;
         }
 
         public async Task<bool> IsNameOrMailExists(string name, string email)

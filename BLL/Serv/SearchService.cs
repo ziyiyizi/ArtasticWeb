@@ -40,7 +40,7 @@ namespace BLL.Serv
             }
             else
             {
-             
+                _artworks = await _uw.ArtworkRepository.GetAllPageByName(key, page);
             }
             return _artworks ?? new List<artworks>();
 

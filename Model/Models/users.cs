@@ -10,6 +10,7 @@ namespace Model.Models
     {
         [Key]
         [Column(TypeName = "uint")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long User_ID { get; set; }
 
         [Required]

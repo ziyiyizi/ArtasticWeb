@@ -33,9 +33,14 @@ namespace ArtasticWeb.Controllers
                     p.errorMsg = ("The name or email is already exists!");
                     return new JsonResult(p);
                 }
-                if (await userService.Register(p) == -1)
+                var user = await userService.Register(p);
+                if (user == null)
                 {
                     p.error = true;
+                }
+                else
+                {
+                    p.userId = user.User_ID;
                 }
             }
             catch (Exception e)
@@ -158,14 +163,16 @@ namespace ArtasticWeb.Controllers
 
             }
 
-            return user == null ? new JsonResult(new users()) 
-                : new JsonResult(new users
+            return user == null ? new JsonResult(new User())
+                : new JsonResult(new User
                 {
-                    User_name = user.User_name,
-                    User_sex = user.User_sex,
-                    User_description = user.User_description,
-                    User_icon = user.User_icon
-
+                    userName = user.User_name,
+                    userSex = user.User_sex,
+                    userDescription = user.User_description,
+                    userIcon = user.User_icon,
+                    userMail = user.User_mail,
+                    userAge = user.User_age,
+                    userPassword = user.User_password
                 }
                 );
         }

@@ -46,7 +46,7 @@ namespace DAL.Repos
                 return null;
             }
 
-            return await GetPageList(page, e => e.Artwork_name == artworkName);
+            return await GetPageList(page, e => e.Artwork_name.Contains(artworkName));
         }
 
         public async Task<IEnumerable<artworks>> GetAllPageByTag(string tagName, PageRequest page)
@@ -171,7 +171,7 @@ namespace DAL.Repos
             return await (from u in _dbcontext.follow join ru in _dbcontext.artworks
              on u.Artist_ID equals ru.Artist_ID
              where u.Follower_ID == userId
-             orderby ru.Uploadtime
+             orderby ru.Uploadtime descending
              select ru).Skip(page.PageNumber * page.PageSize)
              .Take(page.PageSize)
              .ToListAsync();

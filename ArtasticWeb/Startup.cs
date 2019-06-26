@@ -98,12 +98,12 @@ namespace ArtasticWeb
                     template: "getlikelistandcomments/{controller=Artworks}/{action=GetLikeAndComment}"
                 );
                 routes.MapRoute(
-                    name: "like",
-                    template: "like/{controller=Artworks}/{action=Like}"
+                    name: "likerequest",
+                    template: "likerequest/{controller=Artworks}/{action=Like}"
                 );
                 routes.MapRoute(
-                    name: "comment",
-                    template: "comment/{controller=Artworks}/{action=Comment}"
+                    name: "makecomment",
+                    template: "makecomment/{controller=Artworks}/{action=Comment}"
                 );
                 routes.MapRoute(
                     name: "getpost",
@@ -115,7 +115,7 @@ namespace ArtasticWeb
                 );
                 routes.MapRoute(
                     name: "followmember",
-                    template: "follow/{controller=User}/{action=Follow}"
+                    template: "followmember/{controller=User}/{action=Follow}"
                 );
                 routes.MapRoute(
                     name: "test",
@@ -150,8 +150,12 @@ namespace ArtasticWeb
                     template: "community/{controller=Home}/{action=Index}"
                 );
                 routes.MapRoute(
-                    name: "register",
-                    template: "register/{controller=User}/{action=Register}"
+                    name: "signup",
+                    template: "signup/{controller=User}/{action=Register}"
+                );
+                routes.MapRoute(
+                    name: "post",
+                    template: "post/{controller=Artworks}/{action=GetPost}"
                 );
             });
 
