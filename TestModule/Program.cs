@@ -18,7 +18,8 @@ namespace TestModule
             //String imgUrl = osa.GetImgUrl(name);
             //Console.WriteLine(name);
             //Console.WriteLine(imgUrl);
-            ShareUtils.Now();
+
+           
         }
     }
 }
